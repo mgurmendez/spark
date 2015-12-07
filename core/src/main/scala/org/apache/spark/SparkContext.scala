@@ -529,9 +529,13 @@ class SparkContext(config: SparkConf) extends Logging with ExecutorAllocationCli
 
     // The metrics system for Driver need to be set spark.app.id to app ID.
     // So it should start after we get app ID from the task scheduler and set spark.app.id.
-    metricsSystem.start()
-    // Attach the driver metrics servlet handler to the web ui after the metrics system is started.
-    metricsSystem.getServletHandlers.foreach(handler => ui.foreach(_.attachHandler(handler)))
+    if (_ui.isDefined) {
+      metricsSystem.start()
+      // Attach the driver metrics servlet handler to
+      // the web ui after the metrics system is started.
+      metricsSystem.getServletHandlers.foreach(handler =>
+        ui.foreach(_.attachHandler(handler)))
+    }
 
     _eventLogger =
       if (isEventLogEnabled) {
